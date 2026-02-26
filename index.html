@@ -2,31 +2,32 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>時空探員：數據監控系統</title>
+    <title>時空探員：學科全才版 V9</title>
     <style>
         :root { --neon-blue: #00f3ff; --neon-gold: #ffcf00; --neon-red: #ff4757; --neon-green: #2ed573; --dark-bg: #0a0b1e; }
         body { background: var(--dark-bg); color: white; font-family: "Microsoft JhengHei", sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
         #game-container { width: 95%; max-width: 800px; background: rgba(255, 255, 255, 0.05); padding: 30px; border-radius: 15px; border: 1px solid var(--neon-blue); box-shadow: 0 0 20px rgba(0, 243, 255, 0.1); text-align: center; }
         .hidden { display: none; }
-        .btn { background: transparent; border: 1px solid var(--neon-blue); color: var(--neon-blue); padding: 10px 20px; cursor: pointer; transition: 0.3s; margin: 5px; border-radius: 5px; font-weight: bold; }
+        .btn { 
+            background: transparent; border: 1px solid var(--neon-blue); color: var(--neon-blue); 
+            padding: 12px 20px; font-size: 18px; cursor: pointer; transition: 0.3s; 
+            margin: 8px; border-radius: 5px; width: 85%; font-weight: normal; outline: none;
+        }
         .btn:hover { background: var(--neon-blue); color: black; box-shadow: 0 0 10px var(--neon-blue); }
-        input { padding: 12px; width: 60%; background: #1a1b3a; border: 1px solid var(--neon-blue); color: white; border-radius: 5px; text-align: center; margin-bottom: 20px; }
-        
+        input { padding: 12px; width: 60%; background: #1a1b3a; border: 1px solid var(--neon-blue); color: white; border-radius: 5px; text-align: center; margin-bottom: 20px; font-size: 16px; }
         table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; background: rgba(0,0,0,0.3); }
         th, td { border: 1px solid #333; padding: 10px; text-align: center; }
         th { background: #1a1b3a; color: var(--neon-blue); }
         .stat-card { display: inline-block; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 8px; margin: 10px; min-width: 120px; border: 1px solid #444; }
-        .hard-q { color: var(--neon-red); font-weight: bold; }
-        .easy-q { color: var(--neon-green); }
-        .founder { color: var(--neon-gold); font-weight: bold; text-shadow: 0 0 5px var(--neon-gold); }
+        .founder { color: var(--neon-gold); font-weight: bold; text-shadow: 0 0 8px var(--neon-gold); }
     </style>
 </head>
 <body>
 
 <div id="game-container">
     <div id="start-screen">
-        <h1 style="letter-spacing: 5px;">🌌 時空探員測試 V7</h1>
-        <p>核心數據庫：<span class="founder">已載入創始探員檔案</span></p>
+        <h1 style="letter-spacing: 5px;">🌌 時空探員測試 V9</h1>
+        <p>核心數據庫：<span class="founder">創始人 KONG~ 權限覆蓋</span></p>
         <input type="text" id="player-name" placeholder="探員代號">
         <br>
         <button class="btn" style="width:65%" onclick="handleStart()">初始化系統</button>
@@ -35,42 +36,31 @@
     <div id="quiz-screen" class="hidden">
         <div id="combo-display" style="height:40px; font-size:26px; color:var(--neon-gold); font-weight:bold;"></div>
         <div id="timer">穩定度：<span id="time-left">15</span>s</div>
-        <div id="question-area" style="font-size:20px; margin:20px 0; min-height:80px;"></div>
+        <div id="question-area" style="font-size:19px; margin:20px 0; min-height:80px; line-height: 1.6;"></div>
         <div id="feedback" style="height:30px; font-weight:bold;"></div>
         <div id="options-area"></div>
     </div>
 
     <div id="result-screen" class="hidden">
-        <h2>修復任務結束</h2>
+        <h2>維度修復完成</h2>
         <p id="final-score" style="font-size: 32px; color: var(--neon-blue);"></p>
         <div style="background:rgba(0,0,0,0.5); padding:20px; border-radius:10px; border: 1px solid #444;">
-            <h3 style="color:var(--neon-gold)">🏆 核心排行榜</h3>
-            <ol id="leaderboard" style="text-align:left; line-height: 2;"></ol>
+            <h3 style="color:var(--neon-gold)">🏆 傳奇排行榜</h3>
+            <ol id="leaderboard" style="text-align:left; line-height: 2.2;"></ol>
         </div>
-        <p style="font-size: 11px; color: #555; margin-top: 20px;">[ 系統唯讀模式 - 請重新整理頁面或聯繫管理員 ]</p>
+        <p style="font-size: 11px; color: #555; margin-top: 20px;">[ 系統唯讀 - 權限鎖定 ]</p>
     </div>
 
     <div id="admin-screen" class="hidden">
         <h2 style="color:var(--neon-gold)">🛰️ 探員數據分析中心</h2>
-        <button class="btn" onclick="location.reload()">退出</button>
-        <button class="btn" style="border-color:var(--neon-red); color:var(--neon-red);" onclick="clearAllData()">重置所有數據</button>
-        
+        <button class="btn" style="width:30%" onclick="location.reload()">退出</button>
         <div id="overall-stats">
             <div class="stat-card"><h3>總遊玩</h3><span id="total-plays">0</span></div>
             <div class="stat-card"><h3>平均分</h3><span id="avg-score">0</span></div>
-            <div class="stat-card"><h3>S級大師</h3><span id="s-rank-count">0</span></div>
         </div>
-
         <div class="rank-list" style="max-height: 400px; overflow-y: auto;">
-            <h3>📋 題目難度分析 (答對率)</h3>
-            <table id="question-stats-table">
-                <thead><tr><th>題目關鍵字</th><th>答對次數</th><th>答錯次數</th><th>正確率</th></tr></thead>
-                <tbody id="question-stats-body"></tbody>
-            </table>
-
-            <h3 style="margin-top:30px;">👥 玩家詳細日誌</h3>
             <table id="player-log-table">
-                <thead><tr><th>代號</th><th>得分</th><th>評級</th><th>詳情</th></tr></thead>
+                <thead><tr><th>代號</th><th>得分</th><th>詳情</th></tr></thead>
                 <tbody id="player-log-body"></tbody>
             </table>
         </div>
@@ -79,30 +69,26 @@
 
 <script>
     const questions = [
+        // 原有題目 (數學/國/英)
         { id: 0, q: "【數學】等差數列 x+1, 2x, 4x-5，則 x = ?", options: ["3", "4", "5", "6"], ans: 1 },
-        { id: 1, q: "【數學】log10(2) ≈ 0.3010，2^20 是幾位數？", options: ["6", "7", "20", "8"], ans: 1 },
-        { id: 2, q: "【數學】直角三角形兩股 √7 與 √2，斜邊？", options: ["3", "9", "√5", "5"], ans: 0 },
-        { id: 3, q: "【國文】「不卑不亢」的「亢」字意指？", options: ["急躁", "疲累", "高傲", "強大"], ans: 2 },
-        { id: 4, q: "【國文】「人情世故」的「故」字義？", options: ["溫故", "無故", "一如故往", "變故頻傳"], ans: 3 },
-        { id: 5, q: "【英文】The manager decided to ____ the meeting.", options: ["postpone", "cancel", "preserve", "promote"], ans: 0 },
-        { id: 6, q: "【英文】Hardly ____ down to sleep when the phone rang.", options: ["he had lain", "had he lain", "has he lied", "did he lie"], ans: 1 },
-        { id: 7, q: "【英文】The policy is expected to benefit the economy ____.", options: ["significant", "significance", "significantly", "signifying"], ans: 2 }
+        { id: 1, q: "【英文】If I ____ you, I would take the opportunity.", options: ["am", "was", "be", "were"], ans: 3 },
+        // 新增歷史 (高二上：東亞史/經貿潮流)
+        { id: 10, q: "【歷史】關於16世紀以後，東亞地區白銀大量流入的主要原因為何？", options: ["朝廷發行紙幣失敗", "歐洲人開闢新航路進行貿易", "日本實施鎖國政策", "鄭氏勢力壟斷貿易"], ans: 1 },
+        { id: 11, q: "【歷史】19世紀末，清朝推動自強運動（洋務運動）的核心口號為何？", options: ["尊王攘夷", "師夷長技以制夷", "全盤西化", "變法圖強"], ans: 1 },
+        { id: 12, q: "【歷史】歷史上「朝貢體系」在何種局勢下逐漸瓦解？", options: ["宋元貿易發達", "明初鄭和下西洋", "鴉片戰爭後條約體系建立", "工業革命爆發"], ans: 2 },
+        { id: 13, q: "【歷史】關於日本「明治維新」，下列敘述何者正確？", options: ["主張恢復武士特權", "徹底拒絕西方科技", "實施版籍奉還並推動工業化", "引發中法戰爭"], ans: 2 },
+        // 新增公民 (高二上：法律/權利 + 機會成本)
+        { id: 20, q: "【公民】關於《民法》修正後，目前我國法定成年年齡為幾歲？", options: ["16歲", "18歲", "20歲", "22歲"], ans: 1 },
+        { id: 21, q: "【公民】小明因車禍損壞他人車輛，需負擔賠償費用。此屬於何種法律責任？", options: ["刑事責任", "行政責任", "民事責任", "連帶責任"], ans: 2 },
+        { id: 22, q: "【公民】關於「罪刑法定原則」的敘述，下列何者正確？", options: ["只要行為不道德就可處罰", "處罰依據需有法律明文規定", "法官可隨意解釋法條", "處罰應以報復為唯一目的"], ans: 1 },
+        { id: 23, q: "【公民】小華決定放棄打工（時薪200）去聽音樂會（門票500）。請問聽音樂會的「機會成本」是多少？", options: ["200元", "500元", "700元", "300元"], ans: 2 }
     ];
 
-    // 初始化：如果沒有紀錄，就塞入 KONG~ 的傳說紀錄
     function initFounderRecord() {
         let allData = JSON.parse(localStorage.getItem('agentFullData') || "[]");
         const founderName = "KONG~";
-        const hasFounder = allData.some(d => d.name === founderName);
-        
-        if (!hasFounder) {
-            allData.push({ 
-                name: founderName, 
-                score: 4200, 
-                rank: "S", 
-                logs: "OOOOOOOO",
-                isFounder: true 
-            });
+        if (!allData.some(d => d.name === founderName)) {
+            allData.push({ name: founderName, score: 9999, logs: "OOOOOOOO", isFounder: true });
             localStorage.setItem('agentFullData', JSON.stringify(allData));
         }
     }
@@ -113,13 +99,13 @@
     function handleStart() {
         const val = document.getElementById('player-name').value.trim();
         if (val.toLowerCase() === 'admin') return showAdmin();
-        if (val.toLowerCase() === 'reset') return clearAllData();
         if (val.toLowerCase() === 're') return location.reload();
+        if (val.toLowerCase() === 'reset') { localStorage.clear(); location.reload(); return; }
         if (!val) return alert("請輸入代號");
-        
         playerName = val;
         document.getElementById('start-screen').classList.add('hidden');
         document.getElementById('quiz-screen').classList.remove('hidden');
+        // 每次抽 8 題
         quizSet = [...questions].sort(() => Math.random() - 0.5).slice(0, 8);
         showQuestion();
     }
@@ -136,7 +122,6 @@
             document.getElementById('time-left').innerText = timeLeft;
             if (timeLeft <= 0) checkAnswer(-1);
         }, 1000);
-
         const qData = quizSet[currentQ];
         document.getElementById('question-area').innerText = qData.q;
         const optionsDiv = document.getElementById('options-area');
@@ -153,25 +138,19 @@
         clearInterval(timer);
         const qData = quizSet[currentQ];
         const isCorrect = (index === qData.ans);
-        let qStats = JSON.parse(localStorage.getItem('qStats') || "{}");
-        if(!qStats[qData.id]) qStats[qData.id] = { win: 0, loss: 0 };
-        
         if (isCorrect) {
             combo++;
             let gain = Math.round((100 + timeLeft * 10) * (1 + combo * 0.1));
             score += gain;
             sessionLog.push("O");
-            qStats[qData.id].win++;
             document.getElementById('feedback').style.color = "var(--neon-green)";
-            document.getElementById('feedback').innerText = `✅ +${gain}`;
+            document.getElementById('feedback').innerText = `✅ 修復成功 +${gain}`;
         } else {
             combo = 0;
             sessionLog.push("X");
-            qStats[qData.id].loss++;
             document.getElementById('feedback').style.color = "var(--neon-red)";
-            document.getElementById('feedback').innerText = `❌ 正解：${qData.options[qData.ans] || "超時"}`;
+            document.getElementById('feedback').innerText = `❌ 失敗 (正解：${qData.options[qData.ans] || "超時"})`;
         }
-        localStorage.setItem('qStats', JSON.stringify(qStats));
         document.querySelectorAll('.btn').forEach(b => b.disabled = true);
         setTimeout(() => { currentQ++; showQuestion(); }, 1200);
     }
@@ -179,49 +158,24 @@
     function endGame() {
         document.getElementById('quiz-screen').classList.add('hidden');
         document.getElementById('result-screen').classList.remove('hidden');
-        document.getElementById('final-score').innerText = `最終得分：${score}`;
-        
-        let rank = score >= 1200 ? "S" : (score >= 800 ? "A" : "B");
+        document.getElementById('final-score').innerText = `最終積分：${score}`;
         let allData = JSON.parse(localStorage.getItem('agentFullData') || "[]");
-        allData.push({ name: playerName, score: score, rank: rank, logs: sessionLog.join('') });
+        allData.push({ name: playerName, score: score, logs: sessionLog.join('') });
         localStorage.setItem('agentFullData', JSON.stringify(allData));
-
         const list = document.getElementById('leaderboard');
         const top5 = [...allData].sort((a,b) => b.score - a.score).slice(0, 5);
-        list.innerHTML = top5.map(r => {
-            const founderClass = r.name === "KONG~" ? "founder" : "";
-            return `<li class="${founderClass}"><strong>${r.score}</strong> - ${r.name} ${r.isFounder ? "👑" : ""}</li>`;
-        }).join('');
+        list.innerHTML = top5.map(r => `<li class="${r.name==='KONG~'?'founder':''}"><strong>${r.score}</strong> - ${r.name} ${r.isFounder ? "👑" : ""}</li>`).join('');
     }
 
     function showAdmin() {
         document.getElementById('start-screen').classList.add('hidden');
         document.getElementById('admin-screen').classList.remove('hidden');
         const allData = JSON.parse(localStorage.getItem('agentFullData') || "[]");
-        const qStats = JSON.parse(localStorage.getItem('qStats') || "{}");
         document.getElementById('total-plays').innerText = allData.length;
         let avg = allData.length ? Math.round(allData.reduce((a,b) => a + b.score, 0) / allData.length) : 0;
         document.getElementById('avg-score').innerText = avg;
-        document.getElementById('s-rank-count').innerText = allData.filter(d => d.rank === 'S').length;
-        const qBody = document.getElementById('question-stats-body');
-        qBody.innerHTML = questions.map(q => {
-            const s = qStats[q.id] || { win: 0, loss: 0 };
-            const total = s.win + s.loss;
-            const rate = total ? Math.round((s.win/total)*100) : 0;
-            const rateClass = rate < 50 ? 'hard-q' : 'easy-q';
-            return `<tr><td>${q.q.substring(0,10)}...</td><td>${s.win}</td><td>${s.loss}</td><td class="${rateClass}">${rate}%</td></tr>`;
-        }).join('');
         const pBody = document.getElementById('player-log-body');
-        pBody.innerHTML = allData.reverse().map(r => `
-            <tr><td class="${r.isFounder ? 'founder' : ''}">${r.name}</td><td>${r.score}</td><td>${r.rank}</td><td>${r.logs}</td></tr>
-        `).join('');
-    }
-
-    function clearAllData() {
-        if(confirm("重置將清除所有排名。確認？")) {
-            localStorage.clear();
-            location.reload(); // 重新整理後會自動重新執行 initFounderRecord
-        }
+        pBody.innerHTML = allData.reverse().map(r => `<tr><td class="${r.name==='KONG~'?'founder':''}">${r.name}</td><td>${r.score}</td><td>${r.logs}</td></tr>`).join('');
     }
 </script>
 </body>
