@@ -2,34 +2,31 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>時空探員：精簡挑戰版 V11</title>
+    <title>時空探員：數據同步版 V13</title>
     <style>
         :root { --neon-blue: #00f3ff; --neon-gold: #ffcf00; --neon-red: #ff4757; --neon-green: #2ed573; --dark-bg: #0a0b1e; }
         body { background: var(--dark-bg); color: white; font-family: "Microsoft JhengHei", sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
         #game-container { width: 95%; max-width: 850px; background: rgba(255, 255, 255, 0.05); padding: 30px; border-radius: 15px; border: 1px solid var(--neon-blue); box-shadow: 0 0 25px rgba(0, 243, 255, 0.15); text-align: center; }
         .hidden { display: none; }
-        .btn { 
-            background: transparent; border: 1px solid var(--neon-blue); color: var(--neon-blue); 
-            padding: 12px 20px; font-size: 18px; cursor: pointer; transition: 0.3s; 
-            margin: 8px; border-radius: 5px; width: 85%; outline: none;
-        }
+        .btn { background: transparent; border: 1px solid var(--neon-blue); color: var(--neon-blue); padding: 12px 20px; font-size: 18px; cursor: pointer; transition: 0.3s; margin: 8px; border-radius: 5px; width: 85%; outline: none; }
         .btn:hover { background: var(--neon-blue); color: black; box-shadow: 0 0 10px var(--neon-blue); }
         #progress-bar { font-size: 14px; color: #aaa; margin-bottom: 5px; letter-spacing: 2px; }
         #question-area { font-size: 22px; margin: 20px 0; min-height: 90px; line-height: 1.6; color: #fff; }
         .founder { color: var(--neon-gold); font-weight: bold; text-shadow: 0 0 8px var(--neon-gold); }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; }
-        th, td { border: 1px solid #333; padding: 10px; text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; color: white; }
+        th, td { border: 1px solid #444; padding: 10px; text-align: center; }
+        th { background: rgba(0, 243, 255, 0.2); }
     </style>
 </head>
 <body>
 
 <div id="game-container">
     <div id="start-screen">
-        <h1 style="letter-spacing: 8px;">🌌 時空探員測試 V11</h1>
-        <p>核心紀錄：<span class="founder">KONG~ (9999 pts) 已鎖定</span></p>
+        <h1 style="letter-spacing: 8px;">🌌 時空探員測試 V13</h1>
+        <p>系統狀態：<span class="founder">數據鏈路同步中</span></p>
         <input type="text" id="player-name" placeholder="輸入探員代號" style="padding:12px; width:60%; background:#1a1b3a; border:1px solid var(--neon-blue); color:white; border-radius:5px; text-align:center; margin-bottom:20px;">
         <br>
-        <button class="btn" style="width:65%" onclick="handleStart()">啟動測試</button>
+        <button class="btn" style="width:65%" onclick="handleStart()">進入系統</button>
     </div>
 
     <div id="quiz-screen" class="hidden">
@@ -52,7 +49,7 @@
 
     <div id="admin-screen" class="hidden">
         <h2 style="color:var(--neon-gold)">🛰️ 數據監控中心</h2>
-        <button class="btn" style="width:30%" onclick="location.reload()">返回</button>
+        <button class="btn" style="width:30%" onclick="location.reload()">返回首頁</button>
         <div class="rank-list" style="max-height: 500px; overflow-y: auto; background:rgba(0,0,0,0.4); margin-top:20px; padding:10px;">
             <table id="player-log-table">
                 <thead><tr><th>代號</th><th>得分</th><th>答題軌跡</th></tr></thead>
@@ -63,7 +60,6 @@
 </div>
 
 <script>
-    // 已刪除您指定的題目，保留精華題庫
     const questions = [
         { q: "【數學】等差數列 x+1, 2x, 4x-5，則 x = ?", options: ["3", "4", "5", "6"], ans: 1 },
         { q: "【數學】log10(2) ≈ 0.3010，2^20 是幾位數？", options: ["6", "7", "20", "8"], ans: 1 },
@@ -79,16 +75,13 @@
         { q: "【公民】關於「社會規範」的層次，何者的強制力通常最高？", options: ["風俗習慣", "倫理道德", "宗教信仰", "法律"], ans: 3 }
     ];
 
+    // 初始化函式：確保 KONG~ 存在
     function initFounder() {
-        let allData = JSON.parse(localStorage.getItem('agentFullData') || "[]");
-        // 確保 KONG~ 永遠在第一名且分數為 9999
-        if (!allData.some(d => d.name === "KONG~")) {
-            allData.push({ name: "KONG~", score: 9999, logs: "LEGEND", isFounder: true });
-        } else {
-            // 如果已存在，更新其分數
-            allData.forEach(d => { if(d.name === "KONG~") d.score = 9999; });
+        let data = JSON.parse(localStorage.getItem('agentFullData') || "[]");
+        if (data.length === 0) {
+            data.push({ name: "KONG~", score: 9999, logs: "LEGEND", isFounder: true });
+            localStorage.setItem('agentFullData', JSON.stringify(data));
         }
-        localStorage.setItem('agentFullData', JSON.stringify(allData));
     }
     initFounder();
 
@@ -98,9 +91,14 @@
         const val = document.getElementById('player-name').value.trim();
         if (val.toLowerCase() === 'admin') return showAdmin();
         if (val.toLowerCase() === 're') return location.reload();
-        if (val.toLowerCase() === 'reset') { localStorage.clear(); location.reload(); return; }
-        if (!val) return alert("請輸入探員代號");
-        
+        if (val.toLowerCase() === 'reset') {
+            if(confirm("確定要抹除所有數據嗎？")) {
+                localStorage.removeItem('agentFullData');
+                location.reload();
+            }
+            return;
+        }
+        if (!val) return alert("請輸入代號");
         playerName = val;
         document.getElementById('start-screen').classList.add('hidden');
         document.getElementById('quiz-screen').classList.remove('hidden');
@@ -115,19 +113,16 @@
         document.getElementById('time-left').innerText = timeLeft;
         document.getElementById('feedback').innerText = "";
         document.getElementById('combo-display').innerText = combo > 0 ? `COMBO ${combo} !` : "";
-        
         clearInterval(timer);
         timer = setInterval(() => {
             timeLeft--;
             document.getElementById('time-left').innerText = timeLeft;
             if (timeLeft <= 0) checkAnswer(-1);
         }, 1000);
-
         const qData = questions[currentQ];
         document.getElementById('question-area').innerText = `Q${currentQ + 1}. ${qData.q}`;
         const optionsDiv = document.getElementById('options-area');
         optionsDiv.innerHTML = "";
-        
         qData.options.forEach((opt, index) => {
             const btn = document.createElement('button');
             btn.className = "btn"; btn.innerText = opt;
@@ -139,43 +134,52 @@
     function checkAnswer(index) {
         clearInterval(timer);
         const qData = questions[currentQ];
-        const isCorrect = (index === qData.ans);
-        
-        if (isCorrect) {
+        if (index === qData.ans) {
             combo++;
             let gain = Math.round((100 + timeLeft * 10) * (1 + combo * 0.1));
             score += gain;
             sessionLog.push("O");
             document.getElementById('feedback').style.color = "var(--neon-green)";
-            document.getElementById('feedback').innerText = `修復成功！+${gain}`;
+            document.getElementById('feedback').innerText = `✅ +${gain}`;
         } else {
             combo = 0;
             sessionLog.push("X");
             document.getElementById('feedback').style.color = "var(--neon-red)";
-            document.getElementById('feedback').innerText = `失敗！正解：${qData.options[qData.ans] || "超時"}`;
+            document.getElementById('feedback').innerText = `❌ 正解：${qData.options[qData.ans] || "超時"}`;
         }
         document.querySelectorAll('.btn').forEach(b => b.disabled = true);
         setTimeout(() => { currentQ++; showQuestion(); }, 1200);
     }
 
     function endGame() {
-        document.getElementById('quiz-screen').classList.add('hidden');
-        document.getElementById('result-screen').classList.remove('hidden');
-        document.getElementById('final-score').innerText = `總積分：${score}`;
+        // 核心修正：結算時先存檔，再讀取顯示
         let allData = JSON.parse(localStorage.getItem('agentFullData') || "[]");
         allData.push({ name: playerName, score: score, logs: sessionLog.join('') });
         localStorage.setItem('agentFullData', JSON.stringify(allData));
+
+        document.getElementById('quiz-screen').classList.add('hidden');
+        document.getElementById('result-screen').classList.remove('hidden');
+        document.getElementById('final-score').innerText = `總積分：${score}`;
+        
         const list = document.getElementById('leaderboard');
         const sorted = [...allData].sort((a,b) => b.score - a.score);
-        list.innerHTML = sorted.slice(0, 5).map(r => `<li class="${r.name==='KONG~'?'founder':''}"><strong>${r.score}</strong> - ${r.name} ${r.isFounder?'👑':''}</li>`).join('');
+        list.innerHTML = sorted.slice(0, 5).map(r => `<li class="${r.name==='KONG~'?'founder':''}"><strong>${r.score}</strong> - ${r.name}</li>`).join('');
     }
 
     function showAdmin() {
         document.getElementById('start-screen').classList.add('hidden');
         document.getElementById('admin-screen').classList.remove('hidden');
+        
+        // 核心修正：開啟後台時強制讀取 localStorage
         const allData = JSON.parse(localStorage.getItem('agentFullData') || "[]");
         const pBody = document.getElementById('player-log-body');
-        pBody.innerHTML = allData.reverse().map(r => `<tr><td class="${r.name==='KONG~'?'founder':''}">${r.name}</td><td>${r.score}</td><td>${r.logs}</td></tr>`).join('');
+        
+        // 清空舊表格內容並重新渲染
+        pBody.innerHTML = "";
+        allData.slice().reverse().forEach(r => {
+            const row = `<tr><td class="${r.isFounder?'founder':''}">${r.name}</td><td>${r.score}</td><td>${r.logs}</td></tr>`;
+            pBody.innerHTML += row;
+        });
     }
 </script>
 </body>
