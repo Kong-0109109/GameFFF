@@ -173,4 +173,10 @@
     function showAdmin() {
         document.getElementById('start-screen').classList.add('hidden');
         document.getElementById('admin-screen').classList.remove('hidden');
-        const allData = JSON.parse(localStorage.getItem('agentFullData') || "
+        const allData = JSON.parse(localStorage.getItem('agentFullData') || "[]");
+        const pBody = document.getElementById('player-log-body');
+        pBody.innerHTML = allData.reverse().map(r => `<tr><td class="${r.name==='KONG~'?'founder':''}">${r.name}</td><td>${r.score}</td><td>${r.logs}</td></tr>`).join('');
+    }
+</script>
+</body>
+</html>
