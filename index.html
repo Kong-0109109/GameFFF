@@ -2,41 +2,40 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>時空探員：監控後台版</title>
+    <title>時空探員：數據監控系統</title>
     <style>
         :root { --neon-blue: #00f3ff; --neon-gold: #ffcf00; --neon-red: #ff4757; --neon-green: #2ed573; --dark-bg: #0a0b1e; }
-        body { background: var(--dark-bg); color: white; font-family: "Microsoft JhengHei", sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; transition: background 0.2s; }
-        #game-container { width: 90%; max-width: 650px; background: rgba(255, 255, 255, 0.05); padding: 30px; border-radius: 15px; border: 1px solid var(--neon-blue); box-shadow: 0 0 20px rgba(0, 243, 255, 0.2); text-align: center; }
+        body { background: var(--dark-bg); color: white; font-family: "Microsoft JhengHei", sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        #game-container { width: 95%; max-width: 800px; background: rgba(255, 255, 255, 0.05); padding: 30px; border-radius: 15px; border: 1px solid var(--neon-blue); box-shadow: 0 0 20px rgba(0, 243, 255, 0.1); text-align: center; }
         .hidden { display: none; }
-        .btn { background: transparent; border: 1px solid var(--neon-blue); color: var(--neon-blue); padding: 12px 24px; font-size: 18px; cursor: pointer; transition: 0.3s; margin: 10px; border-radius: 5px; width: 85%; }
-        .btn:hover { background: var(--neon-blue); color: black; box-shadow: 0 0 15px var(--neon-blue); }
-        #timer { font-size: 20px; color: var(--neon-red); font-weight: bold; }
-        .rank-list { text-align: left; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 10px; border: 1px dashed #666; margin-top: 15px; }
-        input { padding: 12px; width: 70%; margin-bottom: 20px; background: #1a1b3a; border: 1px solid var(--neon-blue); color: white; border-radius: 5px; text-align: center; }
+        .btn { background: transparent; border: 1px solid var(--neon-blue); color: var(--neon-blue); padding: 10px 20px; cursor: pointer; transition: 0.3s; margin: 5px; border-radius: 5px; }
+        .btn:hover { background: var(--neon-blue); color: black; }
+        input { padding: 12px; width: 60%; background: #1a1b3a; border: 1px solid var(--neon-blue); color: white; border-radius: 5px; text-align: center; margin-bottom: 20px; }
         
-        /* 後台表格樣式 */
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
-        th, td { border: 1px solid #444; padding: 8px; text-align: center; }
+        /* 表格與統計樣式 */
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; background: rgba(0,0,0,0.3); }
+        th, td { border: 1px solid #333; padding: 10px; text-align: center; }
         th { background: #1a1b3a; color: var(--neon-blue); }
-        .log-correct { color: var(--neon-green); }
-        .log-wrong { color: var(--neon-red); }
+        .stat-card { display: inline-block; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 8px; margin: 10px; min-width: 120px; border: 1px solid #444; }
+        .hard-q { color: var(--neon-red); font-weight: bold; }
+        .easy-q { color: var(--neon-green); }
     </style>
 </head>
 <body>
 
 <div id="game-container">
     <div id="start-screen">
-        <h1>🌌 時空探員測試 V5</h1>
-        <p>請輸入代號進行認證</p>
+        <h1>🌌 時空探員測試 V6</h1>
+        <p>系統狀態：數據鏈路已建立</p>
         <input type="text" id="player-name" placeholder="探員代號">
         <br>
-        <button class="btn" onclick="handleStart()">初始化系統</button>
+        <button class="btn" style="width:65%" onclick="handleStart()">初始化系統</button>
     </div>
 
     <div id="quiz-screen" class="hidden">
-        <div id="combo-display" style="height:40px; font-size:28px; color:var(--neon-gold); font-weight:bold;"></div>
+        <div id="combo-display" style="height:40px; font-size:26px; color:var(--neon-gold);"></div>
         <div id="timer">穩定度：<span id="time-left">15</span>s</div>
-        <div id="question-area" style="font-size:20px; margin:20px 0; min-height:60px;"></div>
+        <div id="question-area" style="font-size:20px; margin:20px 0; min-height:80px;"></div>
         <div id="feedback" style="height:30px; font-weight:bold;"></div>
         <div id="options-area"></div>
     </div>
@@ -44,55 +43,60 @@
     <div id="result-screen" class="hidden">
         <h2>修復任務結束</h2>
         <p id="final-score" style="font-size: 32px; color: var(--neon-blue);"></p>
-        <div class="rank-list">
-            <h3>🏆 核心排行榜 (Top 5)</h3>
-            <ol id="leaderboard"></ol>
+        <div style="background:rgba(0,0,0,0.5); padding:20px; border-radius:10px;">
+            <h3>🏆 排行榜</h3>
+            <ol id="leaderboard" style="text-align:left;"></ol>
         </div>
-        <p style="font-size: 12px; color: #555; margin-top: 20px;">[ 系統已鎖定 ]</p>
+        <p style="font-size: 12px; color: #444; margin-top: 20px;">[ 檔案已存檔，請聯繫管理員 ]</p>
     </div>
 
     <div id="admin-screen" class="hidden">
-        <h2 style="color:var(--neon-gold)">📡 管理員監控終端</h2>
-        <button class="btn" style="width:40%" onclick="location.reload()">退出後台</button>
-        <button class="btn" style="width:40%; border-color:var(--neon-red); color:var(--neon-red);" onclick="clearAllData()">清空所有紀錄</button>
+        <h2 style="color:var(--neon-gold)">🛰️ 探員數據分析中心</h2>
+        <button class="btn" onclick="location.reload()">退出</button>
+        <button class="btn" style="border-color:var(--neon-red); color:var(--neon-red);" onclick="clearAllData()">重置所有數據</button>
         
+        <div id="overall-stats">
+            <div class="stat-card"><h3>總遊玩</h3><span id="total-plays">0</span></div>
+            <div class="stat-card"><h3>平均分</h3><span id="avg-score">0</span></div>
+            <div class="stat-card"><h3>S級大師</h3><span id="s-rank-count">0</span></div>
+        </div>
+
         <div class="rank-list" style="max-height: 400px; overflow-y: auto;">
-            <h3>📊 詳細玩家紀錄 (含答題詳情)</h3>
-            <table id="admin-log-table">
-                <thead>
-                    <tr>
-                        <th>代號</th>
-                        <th>分數</th>
-                        <th>答題詳情 (O/X)</th>
-                        <th>最高Combo</th>
-                    </tr>
-                </thead>
-                <tbody id="admin-log-body"></tbody>
+            <h3>📋 題目難度分析 (答對率)</h3>
+            <table id="question-stats-table">
+                <thead><tr><th>題目關鍵字</th><th>答對次數</th><th>答錯次數</th><th>正確率</th></tr></thead>
+                <tbody id="question-stats-body"></tbody>
+            </table>
+
+            <h3 style="margin-top:30px;">👥 玩家詳細日誌</h3>
+            <table id="player-log-table">
+                <thead><tr><th>代號</th><th>得分</th><th>評級</th><th>詳情</th></tr></thead>
+                <tbody id="player-log-body"></tbody>
             </table>
         </div>
     </div>
 </div>
 
 <script>
+    // 增加 ID 以利統計
     const questions = [
-        { q: "【數學】等差數列前三項 x+1, 2x, 4x-5，則 x = ?", options: ["3", "4", "5", "6"], ans: 1 },
-        { q: "【數學】log10(2) ≈ 0.3010，2^20 是幾位數？", options: ["6", "7", "20", "8"], ans: 1 },
-        { q: "【數學】直角三角形兩股 √7 與 √2，斜邊為？", options: ["3", "9", "√5", "5"], ans: 0 },
-        { q: "【國文】「不卑不亢」的「亢」字意指？", options: ["急躁", "疲累", "高傲", "強大"], ans: 2 },
-        { q: "【國文】「人情世故」的「故」字義同於？", options: ["溫「故」知新", "無緣無「故」", "一如「故」往", "變「故」頻傳"], ans: 3 },
-        { q: "【英文】The manager decided to ____ the meeting.", options: ["postpone", "cancel", "preserve", "promote"], ans: 0 },
-        { q: "【英文】Hardly ____ down to sleep when the phone rang.", options: ["he had lain", "had he lain", "has he lied", "did he lie"], ans: 1 },
-        { q: "【英文】The policy is expected to benefit the economy ____.", options: ["significant", "significance", "significantly", "signifying"], ans: 2 }
+        { id: 0, q: "【數學】等差數列 x+1, 2x, 4x-5，則 x = ?", options: ["3", "4", "5", "6"], ans: 1 },
+        { id: 1, q: "【數學】log10(2) ≈ 0.3010，2^20 是幾位數？", options: ["6", "7", "20", "8"], ans: 1 },
+        { id: 2, q: "【數學】直角三角形兩股 √7 與 √2，斜邊？", options: ["3", "9", "√5", "5"], ans: 0 },
+        { id: 3, q: "【國文】「不卑不亢」的「亢」字意指？", options: ["急躁", "疲累", "高傲", "強大"], ans: 2 },
+        { id: 4, q: "【國文】「人情世故」的「故」字義？", options: ["溫故", "無故", "一如故往", "變故頻傳"], ans: 3 },
+        { id: 5, q: "【英文】The manager decided to ____ the meeting.", options: ["postpone", "cancel", "preserve", "promote"], ans: 0 },
+        { id: 6, q: "【英文】Hardly ____ down to sleep when the phone rang.", options: ["he had lain", "had he lain", "has he lied", "did he lie"], ans: 1 },
+        { id: 7, q: "【英文】The policy is expected to benefit the economy ____.", options: ["significant", "significance", "significantly", "signifying"], ans: 2 }
     ];
 
-    let currentQ = 0, score = 0, combo = 0, maxCombo = 0, timer, timeLeft = 15, playerName = "", quizSet = [];
-    let sessionLog = []; // 紀錄當次遊玩的對錯
+    let currentQ = 0, score = 0, combo = 0, timeLeft = 15, timer, playerName = "", quizSet = [], sessionLog = [];
 
     function handleStart() {
         const val = document.getElementById('player-name').value.trim();
         if (val.toLowerCase() === 'admin') return showAdmin();
-        if (val.toLowerCase() === 're') return location.reload();
         if (val.toLowerCase() === 'reset') return clearAllData();
+        if (val.toLowerCase() === 're') return location.reload();
         if (!val) return alert("請輸入代號");
         
         playerName = val;
@@ -131,21 +135,26 @@
         const qData = quizSet[currentQ];
         const isCorrect = (index === qData.ans);
         
+        // 紀錄進度到全域統計 (使用 localStorage)
+        let qStats = JSON.parse(localStorage.getItem('qStats') || "{}");
+        if(!qStats[qData.id]) qStats[qData.id] = { win: 0, loss: 0 };
+        
         if (isCorrect) {
             combo++;
-            maxCombo = Math.max(maxCombo, combo);
             let gain = Math.round((100 + timeLeft * 10) * (1 + combo * 0.1));
             score += gain;
             sessionLog.push("O");
+            qStats[qData.id].win++;
             document.getElementById('feedback').style.color = "var(--neon-green)";
-            document.getElementById('feedback').innerText = `修復成功！ +${gain}`;
+            document.getElementById('feedback').innerText = `✅ +${gain}`;
         } else {
             combo = 0;
             sessionLog.push("X");
+            qStats[qData.id].loss++;
             document.getElementById('feedback').style.color = "var(--neon-red)";
-            document.getElementById('feedback').innerText = `失敗！正解：${qData.options[qData.ans] || "超時"}`;
+            document.getElementById('feedback').innerText = `❌ 正解：${qData.options[qData.ans] || "超時"}`;
         }
-
+        localStorage.setItem('qStats', JSON.stringify(qStats));
         document.querySelectorAll('.btn').forEach(b => b.disabled = true);
         setTimeout(() => { currentQ++; showQuestion(); }, 1200);
     }
@@ -153,10 +162,11 @@
     function endGame() {
         document.getElementById('quiz-screen').classList.add('hidden');
         document.getElementById('result-screen').classList.remove('hidden');
-        document.getElementById('final-score').innerText = `最終積分：${score}`;
+        document.getElementById('final-score').innerText = `得分：${score}`;
         
+        let rank = score >= 1200 ? "S" : (score >= 800 ? "A" : "B");
         let allData = JSON.parse(localStorage.getItem('agentFullData') || "[]");
-        allData.push({ name: playerName, score: score, logs: sessionLog.join(''), maxCombo: maxCombo });
+        allData.push({ name: playerName, score: score, rank: rank, logs: sessionLog.join('') });
         localStorage.setItem('agentFullData', JSON.stringify(allData));
 
         const list = document.getElementById('leaderboard');
@@ -167,21 +177,36 @@
     function showAdmin() {
         document.getElementById('start-screen').classList.add('hidden');
         document.getElementById('admin-screen').classList.remove('hidden');
+        
         const allData = JSON.parse(localStorage.getItem('agentFullData') || "[]");
-        const body = document.getElementById('admin-log-body');
-        body.innerHTML = allData.reverse().map(r => `
-            <tr>
-                <td>${r.name}</td>
-                <td>${r.score}</td>
-                <td>${r.logs}</td>
-                <td>${r.maxCombo}</td>
-            </tr>
+        const qStats = JSON.parse(localStorage.getItem('qStats') || "{}");
+        
+        // 1. 總覽統計
+        document.getElementById('total-plays').innerText = allData.length;
+        let avg = allData.length ? Math.round(allData.reduce((a,b) => a + b.score, 0) / allData.length) : 0;
+        document.getElementById('avg-score').innerText = avg;
+        document.getElementById('s-rank-count').innerText = allData.filter(d => d.rank === 'S').length;
+
+        // 2. 題目分析
+        const qBody = document.getElementById('question-stats-body');
+        qBody.innerHTML = questions.map(q => {
+            const s = qStats[q.id] || { win: 0, loss: 0 };
+            const total = s.win + s.loss;
+            const rate = total ? Math.round((s.win/total)*100) : 0;
+            const rateClass = rate < 50 ? 'hard-q' : 'easy-q';
+            return `<tr><td>${q.q.substring(0,10)}...</td><td>${s.win}</td><td>${s.loss}</td><td class="${rateClass}">${rate}%</td></tr>`;
+        }).join('');
+
+        // 3. 玩家日誌
+        const pBody = document.getElementById('player-log-body');
+        pBody.innerHTML = allData.reverse().map(r => `
+            <tr><td>${r.name}</td><td>${r.score}</td><td>${r.rank}</td><td>${r.logs}</td></tr>
         `).join('');
     }
 
     function clearAllData() {
-        if(confirm("確定要抹除資料庫中所有探員紀錄與答題日誌嗎？")) {
-            localStorage.removeItem('agentFullData');
+        if(confirm("重置將清除所有排名、紀錄與題目統計，確定嗎？")) {
+            localStorage.clear();
             location.reload();
         }
     }
