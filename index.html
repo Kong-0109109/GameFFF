@@ -2,23 +2,21 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>時空探員：維度修復測試 V3</title>
+    <title>時空探員：作者管理版</title>
     <style>
         :root { --neon-blue: #00f3ff; --neon-gold: #ffcf00; --neon-red: #ff4757; --neon-green: #2ed573; --dark-bg: #0a0b1e; }
         body { background: var(--dark-bg); color: white; font-family: "Microsoft JhengHei", sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; overflow: hidden; transition: background 0.2s; }
-        #game-container { width: 90%; max-width: 600px; background: rgba(255, 255, 255, 0.05); padding: 30px; border-radius: 15px; border: 1px solid var(--neon-blue); box-shadow: 0 0 20px rgba(0, 243, 255, 0.2); text-align: center; position: relative; z-index: 10; }
+        #game-container { width: 90%; max-width: 600px; background: rgba(255, 255, 255, 0.05); padding: 30px; border-radius: 15px; border: 1px solid var(--neon-blue); box-shadow: 0 0 20px rgba(0, 243, 255, 0.2); text-align: center; position: relative; }
         .hidden { display: none; }
         .btn { background: transparent; border: 1px solid var(--neon-blue); color: var(--neon-blue); padding: 12px 24px; font-size: 18px; cursor: pointer; transition: 0.3s; margin: 10px; border-radius: 5px; width: 85%; outline: none; }
         .btn:hover { background: var(--neon-blue); color: black; box-shadow: 0 0 15px var(--neon-blue); }
-        .btn:active { transform: scale(0.95); }
         #timer { font-size: 20px; color: var(--neon-red); margin-bottom: 10px; font-weight: bold; }
         #combo-display { font-size: 28px; color: var(--neon-gold); font-weight: bold; height: 40px; text-shadow: 0 0 10px var(--neon-gold); }
         #feedback { font-size: 20px; font-weight: bold; height: 30px; margin: 10px 0; }
         .rank-list { text-align: left; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 10px; margin-top: 20px; border: 1px dashed #666; }
         .question-text { font-size: 20px; margin-bottom: 25px; line-height: 1.6; min-height: 60px; color: #eee; }
-        input { padding: 12px; width: 70%; margin-bottom: 20px; background: #1a1b3a; border: 1px solid var(--neon-blue); color: white; border-radius: 5px; font-size: 16px; }
+        input { padding: 12px; width: 70%; margin-bottom: 20px; background: #1a1b3a; border: 1px solid var(--neon-blue); color: white; border-radius: 5px; font-size: 16px; text-align: center; }
         
-        /* 動畫效果 */
         .correct-flash { background: #062b16 !important; }
         .wrong-flash { background: #2d0a0a !important; }
         @keyframes bounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
@@ -29,11 +27,11 @@
 
 <div id="game-container">
     <div id="start-screen">
-        <h1>🌌 時空探員測試 V3</h1>
-        <p>即時反饋系統已上線。連續答對獲取更高能量。</p>
-        <input type="text" id="player-name" placeholder="請輸入探員代號">
+        <h1>🌌 時空探員測試 V4</h1>
+        <p>請輸入代號進行認證</p>
+        <input type="text" id="player-name" placeholder="探員代號">
         <br>
-        <button class="btn" onclick="startGame()">初始化系統</button>
+        <button class="btn" id="start-btn" onclick="handleStart()">初始化系統</button>
     </div>
 
     <div id="quiz-screen" class="hidden">
@@ -45,14 +43,13 @@
     </div>
 
     <div id="result-screen" class="hidden">
-        <h2>修復完成</h2>
+        <h2>修復任務結束</h2>
         <p id="final-score" style="font-size: 32px; color: var(--neon-blue);"></p>
         <div class="rank-list">
-            <h3>🏆 核心探員排行 (Top 5)</h3>
+            <h3>🏆 核心排行榜 (Top 5)</h3>
             <ol id="leaderboard"></ol>
         </div>
-        <button class="btn" onclick="location.reload()">重新挑戰</button>
-        <button class="btn" style="border-color:var(--neon-red); color:var(--neon-red); width: 40%; font-size: 14px;" onclick="clearRanks()">清除紀錄</button>
+        <p style="font-size: 12px; color: #555; margin-top: 20px;">[ 系統已鎖定，請聯繫作者重新初始化 ]</p>
     </div>
 </div>
 
@@ -63,19 +60,45 @@
         { q: "【數學】直角三角形兩股 √7 與 √2，斜邊為？", options: ["3", "9", "√5", "5"], ans: 0 },
         { q: "【國文】「不卑不亢」的「亢」字意指？", options: ["急躁", "疲累", "高傲", "強大"], ans: 2 },
         { q: "【國文】「人情世故」的「故」字義同於？", options: ["溫「故」知新", "無緣無「故」", "一如「故」往", "變「故」頻傳"], ans: 3 },
-        { q: "【英文】The manager decided to ____ the meeting until next week.", options: ["postpone", "cancel", "preserve", "promote"], ans: 0 },
+        { q: "【英文】The manager decided to ____ the meeting.", options: ["postpone", "cancel", "preserve", "promote"], ans: 0 },
         { q: "【英文】Hardly ____ down to sleep when the phone rang.", options: ["he had lain", "had he lain", "has he lied", "did he lie"], ans: 1 },
         { q: "【英文】The policy is expected to benefit the economy ____.", options: ["significant", "significance", "significantly", "signifying"], ans: 2 },
-        { q: "【英文】The scientist's theory was so ____ that few people could understand it.", options: ["obvious", "abstract", "flexible", "optimistic"], ans: 1 },
-        { q: "【英文】If I ____ you, I would take the opportunity to study abroad.", options: ["am", "was", "be", "were"], ans: 3 },
-        { q: "【英文】The city is ____ for its ancient temples and delicious street food.", options: ["notorious", "renowned", "vague", "indifferent"], ans: 1 },
-        { q: "【英文】Due to the heavy rain, the outdoor concert was ____.", options: ["called off", "put on", "taken over", "broken out"], ans: 0 }
+        { q: "【英文】The scientist's theory was so ____ that few understood it.", options: ["obvious", "abstract", "flexible", "optimistic"], ans: 1 },
+        { q: "【英文】If I ____ you, I would take the opportunity.", options: ["am", "was", "be", "were"], ans: 3 },
+        { q: "【英文】The city is ____ for its ancient temples.", options: ["notorious", "renowned", "vague", "indifferent"], ans: 1 },
+        { q: "【英文】Due to the heavy rain, the concert was ____.", options: ["called off", "put on", "taken over", "broken out"], ans: 0 }
     ];
 
     let currentQ = 0, score = 0, combo = 0, timer, timeLeft = 15, playerName = "", quizSet = [];
 
-    function startGame() {
-        playerName = document.getElementById('player-name').value || "未知探員";
+    // 作者管理功能：處理指令
+    function handleStart() {
+        const val = document.getElementById('player-name').value.toLowerCase().trim();
+        
+        if (val === 'reset') {
+            if(confirm("確認要清空所有排行榜紀錄？")) {
+                localStorage.removeItem('agentRanksV4');
+                alert("紀錄已抹除。");
+                location.reload();
+            }
+            return;
+        }
+        
+        if (val === 're') {
+            location.reload();
+            return;
+        }
+
+        if (val === "") {
+            alert("請輸入代號。");
+            return;
+        }
+
+        startGame(val);
+    }
+
+    function startGame(name) {
+        playerName = name;
         document.getElementById('start-screen').classList.add('hidden');
         document.getElementById('quiz-screen').classList.remove('hidden');
         quizSet = [...questions].sort(() => Math.random() - 0.5).slice(0, 8);
@@ -84,11 +107,9 @@
 
     function showQuestion() {
         if (currentQ >= quizSet.length) return endGame();
-        
         timeLeft = 15;
         document.getElementById('time-left').innerText = timeLeft;
         document.getElementById('feedback').innerText = "";
-        
         clearInterval(timer);
         timer = setInterval(countDown, 1000);
 
@@ -96,7 +117,6 @@
         document.getElementById('question-area').innerText = qData.q;
         const optionsDiv = document.getElementById('options-area');
         optionsDiv.innerHTML = "";
-        
         qData.options.forEach((opt, index) => {
             const btn = document.createElement('button');
             btn.className = "btn";
@@ -122,30 +142,24 @@
             combo++;
             let gain = Math.round((100 + timeLeft * 10) * (1 + combo * 0.1));
             score += gain;
-            
-            // 答對反饋
             feedbackDiv.style.color = "var(--neon-green)";
             feedbackDiv.innerText = `修復成功！ +${gain}`;
             document.body.classList.add('correct-flash');
             comboDiv.innerHTML = `<span class="combo-anim">COMBO ${combo} !</span>`;
         } else {
             combo = 0;
-            // 答錯反饋
             feedbackDiv.style.color = "var(--neon-red)";
-            feedbackDiv.innerText = `判定失敗！正解是：${qData.options[qData.ans]}`;
+            feedbackDiv.innerText = `失敗！正解：${qData.options[qData.ans]}`;
             document.body.classList.add('wrong-flash');
             comboDiv.innerText = "";
         }
 
-        // 鎖定按鈕防止連點
-        const buttons = document.querySelectorAll('.btn');
-        buttons.forEach(b => b.disabled = true);
-
+        document.querySelectorAll('.btn').forEach(b => b.disabled = true);
         setTimeout(() => {
             document.body.classList.remove('correct-flash', 'wrong-flash');
             currentQ++;
             showQuestion();
-        }, 1200); // 1.2秒後進入下一題
+        }, 1200);
     }
 
     function endGame() {
@@ -153,21 +167,14 @@
         document.getElementById('result-screen').classList.remove('hidden');
         document.getElementById('final-score').innerText = `最終積分：${score}`;
         
-        let ranks = JSON.parse(localStorage.getItem('agentRanksV3') || "[]");
-        ranks.push({ name: playerName, score: score, date: new Date().toLocaleDateString() });
+        let ranks = JSON.parse(localStorage.getItem('agentRanksV4') || "[]");
+        ranks.push({ name: playerName, score: score });
         ranks.sort((a, b) => b.score - a.score);
         ranks = ranks.slice(0, 5);
-        localStorage.setItem('agentRanksV3', JSON.stringify(ranks));
+        localStorage.setItem('agentRanksV4', JSON.stringify(ranks));
 
         const list = document.getElementById('leaderboard');
         list.innerHTML = ranks.map(r => `<li><strong>${r.score}</strong> - ${r.name}</li>`).join('');
-    }
-
-    function clearRanks() {
-        if(confirm("確定要刪除所有排名資料？")) {
-            localStorage.removeItem('agentRanksV3');
-            location.reload();
-        }
     }
 </script>
 
